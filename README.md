@@ -1,1 +1,3 @@
 # Playxel
+Playxel é um catálogo de jogos digitais que tem a função de organizar, acompanhar e analisar o progresso dos seus jogos favoritos. O sistema permite cadastrar jogos, acompanhar status ("não jogado","jogando" e "finalizado"), registar e atualizar horas jogadas, criar coleções personalizadas e gerar relatórios como total de horas, média de avaliações e jogos mais jogados.
+O objetivo é oferecer uma forma simples e eficiente de gerenciar sua biblioteca pessoal de jogos, aplicando conceitos de programação orientada a objetos, herança, encapsulamento, persistência em JSON/SQLite e regras de negócio configuráveis.
