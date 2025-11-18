@@ -38,4 +38,4 @@
 ### Class Configuracoes:
 > Gerencia as preferências do usuário (meta anual, plataforma principal, gêneros favoritos).
 - Atributos: generos_favoritos, meta_anual, plataforma_principal
-- Métodos: -
+- Métodos: carregar(), atualizarConfiguracao(), SalvarAlteracao()
