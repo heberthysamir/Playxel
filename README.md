@@ -19,6 +19,16 @@
 > A uma subclasse da classe pai "Jogo"
 - Atributos: herda os atributos da classe pai
 - Métodos: herda os métodos da classe pai
+
+### Class JogoMobile:
+> A uma subclasse da classe pai "Jogo"
+- Atributos: herda os atributos da classe pai
+- Métodos: herda os métodos da classe pai
+
+### Class JogoConsole:
+> A uma subclasse da classe pai "Jogo"
+- Atributos: herda os atributos da classe pai
+- Métodos: herda os métodos da classe pai
   
 ### Class Catalogo:
 > Classe responsável por gerenciar todos os jogos cadastrados no sistema (filtros, ordenações e buscas).
