@@ -6,10 +6,10 @@ class Jogo:
         2: "jogando",
         3: "finalizado"
     }
-    def __init__(self, nome, genero, dispositivo, horas_jogadas, status, data_inicio, data_termino, ano_lancamento, avaliacao):
+    def __init__(self, nome, genero, plataforma, horas_jogadas, status, data_inicio, data_termino, ano_lancamento, avaliacao):
         self.nome = nome
         self.genero = genero
-        self.dispositivo = dispositivo
+        self.plataforma = plataforma
         self.horas_jogadas = horas_jogadas
         self.status = status
         self.data_inicio = data_inicio
@@ -57,12 +57,14 @@ class Jogo:
     def data_inicio(self):
         return self._data_inicio
     @data_inicio.setter
-    def data_inicio(self,data_inicio):
+    def data_inicio(self, data_inicio):
+        if data_inicio is None or data_inicio == "":
+            self._data_inicio = None
+            return
         try:
-            data_obj = datetime.strptime(data_inicio, "%d/%m/%Y")
-            self._data_inicio = data_obj
+            self._data_inicio = datetime.strptime(data_inicio, "%d/%m/%Y")
         except ValueError:
-            print("Formato de data inválido. Use o formato DD/MM/AAAA.")
+            raise ValueError("Data de inicio inválida. Use o formato dd/mm/yyyy.")
 
     @property
     def data_termino(self):
@@ -86,6 +88,10 @@ class Jogo:
             raise ValueError("Status deve ser 1, 2 ou 3.")
         self._status = Jogo.STATUS_MAP[status]
 
+    def __str__(self):
+        return f"{self.nome} ({self.genero}) - {self.status}"
+
+
     def atualizarHoras(self):
         pass
     def atualizarStatus(self):
@@ -96,24 +102,24 @@ class Jogo:
         else:
             self.avaliacao = int(input("Avalie o jogo, (1-10):"))
             self.horas_jogadas = horas
-            self.status = "finalizado"
-            self.data_termino = date.today()
+            self.status = 3
+            self.data_termino = date.today().strftime("%d/%m/%Y")
             
     def reiniciarJogo(self):
         pass
 
 class JogoPC(Jogo):
-    def __init__(self):
-        pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 class JogoConsole(Jogo):
-    def __init__(self):
-        pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
 class JogoMobile(Jogo):
-    def __init__(self):
-        pass
-    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
 class Catalogo:
     def __init__(self):
         self.jogos = []
@@ -123,20 +129,37 @@ class Catalogo:
             try:
                 nome = input("Digite o nome do jogo: ")
                 genero = input("Digite o genero do jogo: ")
-                dispositivo = input("Digite o dispositivo do seu jogo: ")
+                plataforma = input("Digite o dispositivo do seu jogo: ")
                 horas_jogadas = float(input("Digite as horas jogadas: "))
                 status = int(input("Digite o status, 1.não iniciado, 2.jogando ou 3.finalizado: "))
                 data_inicio = input("Digite a data que você começou a jogar: " )
                 data_termino = None
                 ano = input("Digite o ano de laçamento: ")
                 avaliacao = None
-                jogo = Jogo(nome, genero, dispositivo, horas_jogadas,status, data_inicio, data_termino, ano, avaliacao)
+                if plataforma == "pc":
+                    jogo = JogoPC(nome, genero, plataforma,horas_jogadas, status, data_inicio, data_termino, ano, avaliacao)
+                elif plataforma == "console":
+                    jogo = JogoConsole(nome, genero, plataforma, horas_jogadas, status, data_inicio, data_termino, ano, avaliacao)
+                elif plataforma == "mobile":
+                    jogo = JogoMobile(nome, genero, plataforma, horas_jogadas, status, data_inicio, data_termino, ano, avaliacao)
+                else:
+                    raise ValueError("Plataforma inválida.")
+
                 self.jogos.append(jogo)
                 print("Jogo adicionado com sucesso!")
-                break 
+                break
             except ValueError as erro:
                 print(f"Erro: {erro}. Tente novamente.\n")
-        
+
+    def listarNomes(self):
+        print("\nJogos cadastrados:")
+        if not self.jogos:
+            print("Nenhum jogo cadastrado!")
+            return
+        else:
+            for jogo in self.jogos:
+                print(jogo)
+
     def removerJogo(self):
         pass
     def filtrarGenero(self):
@@ -205,7 +228,8 @@ user = int(input("Digite uma opção: "))
 catalogo = Catalogo()
 while user != 3:
     if user == 1:
-        print("\n-Opções do ctálogo:\n1.Adicionar Jogo\n2.Remover Jogo\n3.Sair\n4.Abrir Jogo\n5.Filtrar Jogos\n6.Ordenar Jogos\n7.Buscar Jogogo")
+        catalogo.listarNomes()
+        print("\n-Opções do ctálogo:\n1.Adicionar Jogo\n2.Remover Jogo\n3.Sair\n4.Abrir Jogo\n5.Filtrar Jogos\n6.Ordenar Jogos\n7.Buscar Jogo")
         user = int(input("\nDigite uma opção do catálogo: "))
         if user == 1:
             catalogo.adicionarJogo()
