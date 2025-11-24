@@ -14,6 +14,11 @@
 > A classe responsável por conter as informações de um jogo e modificar os seus objetos.
 - Atributos: nome, gênero, plataforma, horas_jogadas, status, data_inicio, data_termino, ano_lançamento, avaliação.
 - Métodos: atualizarHoras(), atualizarStatus(), finalizarJogo(), reiniciarJogo()
+
+### Class JogoPC:
+> A uma subclasse da classe pai "Jogo"
+- Atributos: herda os atributos da classe pai
+- Métodos: herda os métodos da classe pai
   
 ### Class Catalogo:
 > Classe responsável por gerenciar todos os jogos cadastrados no sistema (filtros, ordenações e buscas).
