@@ -129,7 +129,7 @@ class Catalogo:
             try:
                 nome = input("Digite o nome do jogo: ")
                 genero = input("Digite o genero do jogo: ")
-                plataforma = input("Digite o dispositivo do seu jogo: ")
+                plataforma = input("Digite a plataforma do seu jogo: ")
                 horas_jogadas = float(input("Digite as horas jogadas: "))
                 status = int(input("Digite o status, 1.não iniciado, 2.jogando ou 3.finalizado: "))
                 data_inicio = input("Digite a data que você começou a jogar: " )
@@ -180,27 +180,66 @@ class Catalogo:
         pass
 
 class Colecao:
-    def __init__(self, nome, jogo):
+    def __init__(self, nome, jogos = None):
         self.nome = nome
-        self.jogo = jogo
+        self.jogos = jogos if jogos is not None else []
+
+    def __str__(self):
+        return f"{self.nome}"
 
     def adicionarJogo(self):
-        pass
+        jogo_nome = input("Digite o nome do jogo que quer adicionar: ")
+        for j in catalogo.jogos:
+            if j.nome == jogo_nome:
+                self.jogos.append(j)
+                print("Jogo adicionado.")
+                return 
+        print("Jogo não encontrado!")
+
     def removerJogo(self):
         pass
     def exibirJogos(self):
-        pass
+        if not self.jogos:
+            print("Nenhum jogo na coleção.")
+            return
+
+        for jogo in self.jogos:
+            print(" -", jogo.nome)
 
 class ListaDeColecoes:
-    def __init__(self,colecao):
-        self.colecao = colecao
+    def __init__(self):
+        self.colecaos = []
     
     def criarColecao(self):
-        pass
+        nome = input("Digite o nome da coleção: ")
+        for c in self.colecaos:
+            if c.nome == nome:
+                print("Já existe uma coleção com esse nome.")
+                return
+        nova = Colecao(nome, [])
+        self.colecaos.append(nova)
+        print("Coleção criada!")
+
     def removerColecao(self):
         pass
+
     def abrirColecao(self):
-        pass
+        nome = input("Digite o nome da coleção que deseja abrir: ")
+        for colecao in self.colecaos:
+            if colecao.nome == nome:
+                return colecao  # retorna a coleção encontrada
+        print("Coleção não encontrada!")
+        return None
+
+
+    def listarColecoes(self):
+        print("\nSuas Coleções:")
+        if not self.colecaos:
+            print("Nenhuma coleção")
+            return
+        else:
+            for colecao in self.colecaos:
+                print(colecao)
 
 class Relatorio:
     def __init__(self, horas_jogadas, avaliacao, status):
@@ -223,13 +262,43 @@ class Configuracoes:
         self.metas = metas
         self.plataforma_principal = plataforma_principal
 
-print("- Opções: \n1.Catálogo\n2.Coleções\n3.Sair")
-user = int(input("Digite uma opção: "))
 catalogo = Catalogo()
-while user != 3:
-    if user == 1:
-        catalogo.listarNomes()
-        print("\n-Opções do ctálogo:\n1.Adicionar Jogo\n2.Remover Jogo\n3.Sair\n4.Abrir Jogo\n5.Filtrar Jogos\n6.Ordenar Jogos\n7.Buscar Jogo")
-        user = int(input("\nDigite uma opção do catálogo: "))
-        if user == 1:
-            catalogo.adicionarJogo()
+suasColecoes = ListaDeColecoes()
+while True:
+    print("- Opções: \n1.Catálogo\n2.Suas coleções\n3.Sair")
+    user = int(input("Digite uma opção: "))
+    if user == 3:
+        break
+    elif user == 1:
+        while True:
+            catalogo.listarNomes()
+            print("\n-Opções do catálogo:\n1.Adicionar Jogo\n2.Remover Jogo\n3.Buscar Jogo\n4.Abrir Jogo\n5.Filtrar Jogos\n6.Ordenar Jogos\n7.Voltar")
+            user = int(input("\nDigite uma opção do catálogo: "))
+            if user == 1:
+                catalogo.adicionarJogo()
+            elif user == 7:
+                break
+    elif user == 2:
+        while True:
+            suasColecoes.listarColecoes()
+            print("\n-Opções das Coleções:\n1.Criar coleção\n2.Remover coleção\n3.Abrir coleção\n4.Voltar")
+            user = int(input("\nDigite uma opção do catálogo: "))
+            if user == 1:
+                suasColecoes.criarColecao()
+            elif user == 3:
+                colecao = suasColecoes.abrirColecao()
+                if colecao is None:
+                    continue 
+                while True:
+                    print(f"\nColeção: {colecao.nome}")
+                    colecao.exibirJogos()
+                    print("\n1. Adicionar Jogo\n2. Remover Jogo\n3. Voltar")
+                    user = int(input("Digite uma opção da coleção: "))
+                    if user == 1:
+                        colecao.adicionarJogo()
+                    elif user == 3:
+                        break
+            elif user == 4:
+                break
+
+
