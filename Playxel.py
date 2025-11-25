@@ -16,6 +16,9 @@ class Jogo:
         self.data_termino = data_termino
         self.ano_lancamento = ano_lancamento
         self.avaliacao = avaliacao
+    
+    def __str__(self):
+        return f"{self.nome} ({self.genero}) - {self.status}"
 
     @property
     def nome(self):
@@ -87,10 +90,6 @@ class Jogo:
         if status not in (1,2,3):
             raise ValueError("Status deve ser 1, 2 ou 3.")
         self._status = Jogo.STATUS_MAP[status]
-
-    def __str__(self):
-        return f"{self.nome} ({self.genero}) - {self.status}"
-
 
     def atualizarHoras(self):
         pass
@@ -264,41 +263,41 @@ class Configuracoes:
 
 catalogo = Catalogo()
 suasColecoes = ListaDeColecoes()
-while True:
-    print("- Opções: \n1.Catálogo\n2.Suas coleções\n3.Sair")
-    user = int(input("Digite uma opção: "))
-    if user == 3:
-        break
-    elif user == 1:
-        while True:
-            catalogo.listarNomes()
-            print("\n-Opções do catálogo:\n1.Adicionar Jogo\n2.Remover Jogo\n3.Buscar Jogo\n4.Abrir Jogo\n5.Filtrar Jogos\n6.Ordenar Jogos\n7.Voltar")
-            user = int(input("\nDigite uma opção do catálogo: "))
-            if user == 1:
-                catalogo.adicionarJogo()
-            elif user == 7:
-                break
-    elif user == 2:
-        while True:
-            suasColecoes.listarColecoes()
-            print("\n-Opções das Coleções:\n1.Criar coleção\n2.Remover coleção\n3.Abrir coleção\n4.Voltar")
-            user = int(input("\nDigite uma opção do catálogo: "))
-            if user == 1:
-                suasColecoes.criarColecao()
-            elif user == 3:
-                colecao = suasColecoes.abrirColecao()
-                if colecao is None:
-                    continue 
-                while True:
-                    print(f"\nColeção: {colecao.nome}")
-                    colecao.exibirJogos()
-                    print("\n1. Adicionar Jogo\n2. Remover Jogo\n3. Voltar")
-                    user = int(input("Digite uma opção da coleção: "))
-                    if user == 1:
-                        colecao.adicionarJogo()
-                    elif user == 3:
-                        break
-            elif user == 4:
-                break
 
-
+if __name__ == "__main__":
+    while True:
+        print("- Opções: \n1.Catálogo\n2.Suas coleções\n3.Sair")
+        user = int(input("Digite uma opção: "))
+        if user == 3:
+            break
+        elif user == 1:
+            while True:
+                catalogo.listarNomes()
+                print("\n-Opções do catálogo:\n1.Adicionar Jogo\n2.Remover Jogo\n3.Buscar Jogo\n4.Abrir Jogo\n5.Filtrar Jogos\n6.Ordenar Jogos\n7.Voltar")
+                user = int(input("\nDigite uma opção do catálogo: "))
+                if user == 1:
+                    catalogo.adicionarJogo()
+                elif user == 7:
+                    break
+        elif user == 2:
+            while True:
+                suasColecoes.listarColecoes()
+                print("\n-Opções das Coleções:\n1.Criar coleção\n2.Remover coleção\n3.Abrir coleção\n4.Voltar")
+                user = int(input("\nDigite uma opção do catálogo: "))
+                if user == 1:
+                    suasColecoes.criarColecao()
+                elif user == 3:
+                    colecao = suasColecoes.abrirColecao()
+                    if colecao is None:
+                        continue 
+                    while True:
+                        print(f"\nColeção: {colecao.nome}")
+                        colecao.exibirJogos()
+                        print("\n1. Adicionar Jogo\n2. Remover Jogo\n3. Voltar")
+                        user = int(input("Digite uma opção da coleção: "))
+                        if user == 1:
+                            colecao.adicionarJogo()
+                        elif user == 3:
+                            break
+                elif user == 4:
+                    break
