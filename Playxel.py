@@ -369,13 +369,15 @@ class ListaDeColecoes:
                 print("-",colecao)
 
 class Relatorio:
-    def __init__(self, horas_jogadas, avaliacao, status):
-        self.horas_jogadas = horas_jogadas
-        self.avaliacao = avaliacao
-        self.status = status
+    def __init__(self,jogos):
+        self.jogos = jogos
 
     def calcularHorasTotais(self):
-        pass
+        return sum(j.horas_jogadas for j in self.jogos)
+    
+    def calcularJogos(self):
+        return len(self.jogos)
+    
     def calcularAvaliacoes(self):
         pass
     def calcularPercentualStatus(self):
@@ -451,5 +453,8 @@ if __name__ == "__main__":
                             break
                 elif user == 4:
                     break
-
+        elif user == 3:
+            rel = Relatorio(catalogo.jogos)
+            print("\nHoras totais:", rel.calcularHorasTotais())
+            print("Quantidade de jogos:", rel.calcularJogos(),"\n")
 
