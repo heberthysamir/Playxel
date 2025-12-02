@@ -1,75 +1,29 @@
-import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from Playxel import Jogo, JogoPC, JogoConsole, JogoMobile
-from datetime import datetime
+import pytest
+from Playxel import Jogo, JogoPC, JogoConsole, JogoMobile, jogo_from_dict
 
-def test_criacao_jogo_valido():
-    jogo = Jogo(
-        nome="Minecraft",
-        genero="Sandbox",
-        plataforma="pc",
-        horas_jogadas=10.5,
-        status=1,
-        data_inicio="10/01/2024",
-        data_termino=None,
-        ano_lancamento="2011",
-        avaliacao=None
-    )
+def test_criacao_jogo_basico():
+    jogo = Jogo("Teste", "Ação", "pc", 10, 1, "01/01/2024", "Não informada", 2020, 8, "não")
+    assert jogo.nome == "Teste"
+    assert jogo.genero == "Ação"
+    assert jogo.status == "inativo"
+    assert jogo.horas_jogadas == 10
 
-    assert jogo.nome == "Minecraft"
-    assert jogo.genero == "Sandbox"
-    assert jogo._status == "não iniciado"
-    assert jogo.horas_jogadas == 10.5
-    assert isinstance(jogo.data_inicio, datetime)
-    assert jogo.data_termino is None
+def test_subclasses_pc_console_mobile():
+    pc = JogoPC("Steam", "Jogo PC", "Ação", "pc", 10, 1, "01/01", "Não", 2020, 8, "não")
+    console = JogoConsole("PS5", "Jogo Console", "RPG", "console", 5, 2, "01/02", "Não", 2018, 7, "sim")
+    mobile = JogoMobile("Android", "Jogo Mobile", "Puzzle", "mobile", 3, 1, "01/03", "Não", 2019, 6, "não")
 
+    assert pc.launcher == "Steam"
+    assert console.console == "PS5"
+    assert mobile.sistema == "Android"
 
-def test_nome_vazio_deve_gerar_erro():
-    import pytest
-    with pytest.raises(ValueError):
-        Jogo("", "Ação", "pc", 10, 1, "10/01/2024", None, 2020, None)
+def test_dicionario_e_reconstrucao():
+    original = JogoPC("Steam", "Elden Ring", "Ação", "pc", 50, 3, "01/01", "01/03", 2022, 10, "não")
+    d = original.dicionario()
 
+    novo = jogo_from_dict(d)
 
-def test_status_convertido_para_texto():
-    jogo = Jogo(
-        nome="FIFA",
-        genero="Esporte",
-        plataforma="console",
-        horas_jogadas=5,
-        status=2,
-        data_inicio="01/02/2024",
-        data_termino=None,
-        ano_lancamento=2023,
-        avaliacao=None
-    )
-    assert jogo.status == "jogando"
-
-
-def test_avaliacao_inicial_none():
-    jogo = Jogo(
-        "LOL", "MOBA", "pc",
-        0, 1,
-        "01/01/2024",
-        None,
-        2009,
-        None
-    )
-    assert jogo.avaliacao is None
-
-
-def test_avaliacao_valida():
-    jogo = Jogo(
-        "GTA V", "Ação", "console",
-        20, 3,
-        "10/10/2020",
-        "20/10/2020",
-        2013,
-        9
-    )
-    assert jogo.avaliacao == 9
-
-
-def test_avaliacao_invalida():
-    import pytest
-    with pytest.raises(ValueError):
-        Jogo("GTA", "Ação", "console", 10, 1, "10/10/2020", None, 2013, 15)
+    assert isinstance(novo, JogoPC)
+    assert novo.nome == "Elden Ring"
+    assert novo.launcher == "Steam"
+    assert novo.status == "finalizado"

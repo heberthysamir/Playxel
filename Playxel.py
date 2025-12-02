@@ -1,6 +1,8 @@
+import json
+
 class Jogo:
     STATUS_MAP = {
-        1: "não iniciado",
+        1: "inativo",
         2: "jogando",
         3: "finalizado"
     }
@@ -18,6 +20,22 @@ class Jogo:
     
     def __str__(self):
         return f"{self.nome} ({self.genero}) - {self.status}"
+    
+    def dicionario(self):
+        return {
+            "nome": self.nome,
+            "genero": self.genero,
+            "plataforma": self.plataforma,
+            "horas_jogadas": self.horas_jogadas,
+            "status": self.status,
+            "data_inicio": self.data_inicio,
+            "data_termino": self.data_termino,
+            "ano_lancamento": self.ano_lancamento,
+            "avaliacao": self.avaliacao,
+            "multiplayer": self.multiplayer,
+            "tipo": self.__class__.__name__,
+            "extra": getattr(self, "launcher", getattr(self, "console", getattr(self, "sistema", None)))
+        }
 
     @property
     def nome(self):
@@ -142,6 +160,38 @@ class JogoMobile(Jogo):
         super().__init__(*args, **kwargs)
         self.sistema = sistema
 
+def jogo_from_dict(data):
+    tipo = data.get("tipo")
+
+    if tipo == "JogoPC":
+        return JogoPC(
+            data["extra"], data["nome"], data["genero"], data["plataforma"], data["horas_jogadas"],
+            1 if data["status"] == "inativo" else
+            2 if data["status"] == "jogando" else 3,
+            data["data_inicio"], data["data_termino"], data["ano_lancamento"],
+            data["avaliacao"], data["multiplayer"]
+        )
+
+    if tipo == "JogoConsole":
+        return JogoConsole(
+            data["extra"],
+            data["nome"], data["genero"], data["plataforma"], data["horas_jogadas"],
+            1 if data["status"] == "inativo" else
+            2 if data["status"] == "jogando" else 3,
+            data["data_inicio"], data["data_termino"], data["ano_lancamento"],
+            data["avaliacao"], data["multiplayer"]
+        )
+
+    if tipo == "JogoMobile":
+        return JogoMobile(
+            data["extra"],
+            data["nome"], data["genero"], data["plataforma"], data["horas_jogadas"],
+            1 if data["status"] == "inativo" else
+            2 if data["status"] == "jogando" else 3,
+            data["data_inicio"], data["data_termino"], data["ano_lancamento"],
+            data["avaliacao"], data["multiplayer"]
+        )
+
 class Catalogo:
     def __init__(self):
         self.jogos = []
@@ -183,10 +233,26 @@ class Catalogo:
                     raise ValueError("Plataforma inválida.")
 
                 self.jogos.append(jogo)
+                self.salvar()
                 print("Jogo adicionado com sucesso!")
                 break
             except ValueError as erro:
                 print(f"Erro: {erro}. Tente novamente.\n")
+    
+    def salvar(self):
+        lista_dicts = [jogo.dicionario() for jogo in self.jogos]
+
+        with open("jogos.json", "w", encoding="utf-8") as arquivo:
+            json.dump(lista_dicts, arquivo, indent=4, ensure_ascii=False)
+
+    def carregar(self):
+        try:
+            with open("jogos.json", "r", encoding="utf-8") as arquivo:
+                lista_dicts = json.load(arquivo)
+                self.jogos = [jogo_from_dict(d) for d in lista_dicts]
+        except FileNotFoundError:
+            self.jogos = []
+
 
     def listarNomes(self):
         print("\nJogos cadastrados:")
@@ -210,6 +276,7 @@ class Catalogo:
         for jogo in self.jogos:
             if jogo.nome == nome:
                 self.jogos.remove(jogo)
+                self.salvar()
                 print("Jogo deletado")
                 return
         print("Jogo não encontrado.")
@@ -323,6 +390,7 @@ class Configuracoes:
         self.plataforma_principal = plataforma_principal
 
 catalogo = Catalogo()
+catalogo.carregar()
 suasColecoes = ListaDeColecoes()
 
 if __name__ == "__main__":
@@ -350,10 +418,13 @@ if __name__ == "__main__":
                         user = int(input("Digite o que quer fazer com seu jogo: "))
                         if user == 1:
                             jogo.atualizarHoras()
+                            catalogo.salvar()
                         elif user == 2:
                             jogo.atualizarStatus()
+                            catalogo.salvar()
                         elif user == 3:
                             jogo.reiniciarJogo()
+                            catalogo.salvar()
                         elif user == 4:
                             break
                 elif user == 7:

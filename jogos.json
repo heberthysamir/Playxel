@@ -1,0 +1,16 @@
+[
+    {
+        "nome": "Minecraft",
+        "genero": "aventura",
+        "plataforma": "mobile",
+        "horas_jogadas": 24.0,
+        "status": "jogando",
+        "data_inicio": "2018",
+        "data_termino": "Não informada",
+        "ano_lancamento": "2001",
+        "avaliacao": 0,
+        "multiplayer": "sim",
+        "tipo": "JogoMobile",
+        "extra": "android"
+    }
+]
