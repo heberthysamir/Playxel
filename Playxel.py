@@ -19,7 +19,7 @@ class Jogo:
         self.multiplayer = multiplayer
     
     def __str__(self):
-        return f"{self.nome} ({self.genero}) - {self.status}"
+        return f"{self.nome} ({self.genero}) - {self.plataforma}"
     
     def __eq__(self, outro):
         if not isinstance(outro, Jogo):
@@ -205,6 +205,7 @@ def jogo_from_dict(data):
 class Catalogo:
     def __init__(self):
         self.jogos = []
+        self.jogos_filtrados = None
     
     def adicionarJogo(self):
         while True: 
@@ -281,23 +282,38 @@ class Catalogo:
 
 
     def listarNomes(self):
+        lista = self.jogos_filtrados if self.jogos_filtrados is not None else self.jogos
         print("\nJogos cadastrados:")
         if not self.jogos:
             print("Nenhum jogo cadastrado!")
             return
         else:
-            for jogo in self.jogos:
+            for jogo in lista:
                 print(jogo)
 
     def abrirJogo(self):
-        nome = input("Digite o nome do jogo que deseja abrir: ")
-        if nome.strip() == "":
-            return None
-        for jogo in self.jogos:
-            if jogo.nome == nome:
-                return jogo
-        print("\n[Jogo não encontrado. Tente novamente!]")
-        return False
+        while True:
+            nome = input("Digite o nome do jogo que deseja abrir: ").strip()
+            if nome == "":
+                return None
+            encontrados = [j for j in self.jogos if j.nome.lower() == nome.lower()]
+            if len(encontrados) == 0:
+                print("\n[Jogo não encontrado. Tente novamente!]\n")
+                continue
+            if len(encontrados) == 1:
+                return encontrados[0]
+            print(f"\nForam encontrados {len(encontrados)} jogos com o nome '{nome}':\n")
+            for i, jogo in enumerate(encontrados, start=1):
+                print(f"{i}. {jogo.nome} - Plataforma: {jogo.plataforma}")
+            while True:
+                try:
+                    escolha = int(input("\nEscolha o número do jogo que deseja abrir: "))
+                    if 1 <= escolha <= len(encontrados):
+                        return encontrados[escolha - 1]
+                    else:
+                        print("Opção inválida.")
+                except ValueError:
+                    print("Digite um número válido.")
 
     def removerJogo(self):
         nome = input("Digite o nome do jogo que deseja remover: ")
@@ -310,21 +326,42 @@ class Catalogo:
         print("Jogo não encontrado.")
     
     def filtrarGenero(self):
-        pass
-    def filtrarAvaliacao(self):
-        pass
+        generos = sorted({jogo.genero for jogo in self.jogos})
+        print("\nGêneros cadastrados:")
+        for g in generos:
+            print("-", g)
+        genero = input("\nDigite o gênero que deseja filtrar: ").strip()
+        if genero not in generos:
+            print("\n[Gênero não encontrado!]")
+            return
+        self.jogos_filtrados = [jogo for jogo in self.jogos if jogo.genero == genero]
+
     def filtrarPlataforma(self):
-        pass
+        plataformas = sorted({jogo.plataforma for jogo in self.jogos})
+        for p in plataformas:
+            print("-", p)
+        plataforma = input("\nDigite a plataforma que deseja filtrar: ").strip()
+        if plataforma not in plataformas:
+            print("[Plataforma não encontrada!]")
+            return
+        self.jogos_filtrados = [jogo for jogo in self.jogos if jogo.plataforma == plataforma]
+
     def filtrarStatus(self):
-        pass
-    def ordenarAvaliacao(self):
-        pass
+        statuss = sorted({jogo.status for jogo in self.jogos})
+        for s in statuss:
+            print("-", s)
+        status = input("\nDigite o status que deseja filtrar: ").strip()
+        if status not in statuss:
+            print("[Status não encontrado!]")
+            return
+        self.jogos_filtrados = [jogo for jogo in self.jogos if jogo.status == status]
+
     def ordenarTempoJogado(self):
         pass
     def ordenarLancamento(self):
         pass
-    def buscarTitulo(self):
-        pass
+    def limparFiltro(self):
+        self.jogos_filtrados = None  
 
 class Colecao:
     def __init__(self, nome, jogos = None):
@@ -539,6 +576,24 @@ if __name__ == "__main__":
                             jogo.reiniciarJogo()
                             catalogo.salvar()
                         elif user == 4:
+                            break
+                elif user == 5:
+                    while True:
+                        print("\n-Como deseja filtrar:\n1.Gênero\n2.Plataforma\n3.Status\n4.Limpar\n5.Voltar")
+                        user = int(input("\nDigite uma opção: "))
+                        if user == 1:
+                            catalogo.filtrarGenero()
+                            break
+                        elif user == 2:
+                            catalogo.filtrarPlataforma()
+                            break
+                        elif user == 3:
+                            catalogo.filtrarStatus()
+                            break
+                        elif user == 4:
+                            catalogo.limparFiltro()
+                            break
+                        elif user == 5:
                             break
         elif user == 4:
             configuracoes.menuConfiguracoes()
