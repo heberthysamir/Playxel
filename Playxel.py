@@ -21,6 +21,11 @@ class Jogo:
     def __str__(self):
         return f"{self.nome} ({self.genero}) - {self.status}"
     
+    def __eq__(self, outro):
+        if not isinstance(outro, Jogo):
+            return False
+        return self.nome.lower() == outro.nome.lower() and self.plataforma.lower() == outro.plataforma.lower()
+
     def dicionario(self):
         return {
             "nome": self.nome,
@@ -113,25 +118,30 @@ class Jogo:
         novo_status = int(input("Qual é o novo status? (1. inativo, 2. jogando, 3. finalizado): "))
         if novo_status == 1:
             self.status = 1
-            print("Status atualizado",self.status)
+            print("Status atualizado!",self.status)
         elif novo_status == 2:
+            if configuracoes.limite_jogando not in (None, "", 0):
+                contJogando = sum(1 for j in catalogo.jogos if j.status == "jogando")
+                if contJogando >= int(configuracoes.limite_jogando):
+                    print(f"\n[Você atingiu o limite de ({configuracoes.limite_jogando}) jogos com status 'jogando']")
+                    return
             self.status = 2
             self.data_inicio = input("Digite a data que começou/voltou a jogar: ")
             self.horas_jogadas += int(input("Digite quantas horas foram jogadas: "))
-            print("Status atualizado",self.status)
+            print("Status atualizado!")
         elif novo_status == 3:
             self.finalizarJogo()
         else:
-            raise ValueError("Status deve ser 1, 2 ou 3.")
+            raise ValueError("[Status deve ser 1, 2 ou 3]")
             
     def finalizarJogo(self):
-        if self.horas_jogadas <5:
-            print("Não é possível finalizar o jogo com menos de 5 horas jogadas")
+        if self.horas_jogadas < configuracoes.limite_horas:
+            print(f"[Não é possível finalizar o jogo com menos de {configuracoes.limite_horas} horas jogadas]")
         else:
             self.avaliacao = int(input("Avalie o jogo, (1-10):"))
             self.status = 3
             self.data_termino = input("Digite a data estimada do término: ")
-            print("Jogo finalizado.")
+            print("Jogo finalizado!")
             
     def reiniciarJogo(self):
         reiniciar = input("Deseja mesmo reiniciar o jogo?(sim ou não): ")
@@ -210,31 +220,47 @@ class Catalogo:
                     data_termino = "Não informada"
                     horas_jogadas = 0
                     avaliacao = 0
+
                 elif status == 2:
+                    contJogando = sum(1 for j in self.jogos if j.status == "jogando")
+                    limite = configuracoes.limite_jogando
+                    if limite is not None and limite != "" and contJogando >= int(limite):
+                        print(f"\nVocê atingiu o limite de ({limite}) jogos com status 'jogando'.")
+                        return
                     horas_jogadas = float(input("Digite as horas jogadas: "))
                     data_inicio = input("Digite a data estimada que você começou a jogar: " )
                     data_termino = "Não informada"
                     avaliacao = 0
+
                 elif status == 3:
                     horas_jogadas = float(input("Digite as horas jogadas: "))
                     data_inicio = input("Digite a data estimada que você começou a jogar: " )
                     data_termino = input("Digite a data estimada que você terminou de jogar: " )
                     avaliacao = input("Como você avalia o jogo?(1-10): ")
+
                 if plataforma == "pc":
                     launcher = input("Digite o seu laucher: ")
                     jogo = JogoPC(launcher, nome, genero, plataforma,horas_jogadas, status, data_inicio, data_termino, ano, avaliacao, multiplayer)
+
                 elif plataforma == "console":
                     console = input("Digite o seu console: ")
                     jogo = JogoConsole(console, nome, genero, plataforma, horas_jogadas, status, data_inicio, data_termino, ano, avaliacao, multiplayer)
+
                 elif plataforma == "mobile":
                     sistema = input("Seu sistema é android ou IOs? ")
                     jogo = JogoMobile(sistema, nome, genero, plataforma, horas_jogadas, status, data_inicio, data_termino, ano, avaliacao, multiplayer)
+
                 else:
                     raise ValueError("Plataforma inválida.")
 
+                for existente in self.jogos:
+                    if existente == jogo:
+                        print("\n[Este jogo já existe nesta plataforma!]")
+                        return
+                    
                 self.jogos.append(jogo)
                 self.salvar()
-                print("Jogo adicionado com sucesso!")
+                print("\nJogo adicionado com sucesso!")
                 break
             except ValueError as erro:
                 print(f"Erro: {erro}. Tente novamente.\n")
@@ -265,11 +291,13 @@ class Catalogo:
 
     def abrirJogo(self):
         nome = input("Digite o nome do jogo que deseja abrir: ")
+        if nome.strip() == "":
+            return None
         for jogo in self.jogos:
             if jogo.nome == nome:
                 return jogo
-        print("\nJogo não encontrado. Tente novamente.\n")
-        return None
+        print("\n[Jogo não encontrado. Tente novamente!]")
+        return False
 
     def removerJogo(self):
         nome = input("Digite o nome do jogo que deseja remover: ")
@@ -316,7 +344,14 @@ class Colecao:
         print("Jogo não encontrado!")
 
     def removerJogo(self):
-        pass
+        nome = input("Digite o nome do jogo que deseja remover: ")
+        for j in catalogo.jogos:
+            if j.nome == nome:
+                self.jogos.remove(j)
+                print("Jogo deletado")
+                return
+        print("Jogo não encontrado.")
+
     def exibirJogos(self):
         if not self.jogos:
             print("Nenhum jogo na coleção.")
@@ -324,14 +359,6 @@ class Colecao:
 
         for jogo in self.jogos:
             print(" -", jogo.nome)
-
-class ColecaoFinalizado(Colecao):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-class ColecaoMultiplayer(Colecao):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 class ListaDeColecoes:
     def __init__(self):
@@ -348,7 +375,13 @@ class ListaDeColecoes:
         print("Coleção criada!")
 
     def removerColecao(self):
-        pass
+        nome = input("Digite o nome da coleção que deseja remover: ")
+        for c in self.colecaos:
+            if c.nome == nome:
+                self.colecaos.remove(c)
+                print("Coleção deletado")
+                return
+        print("Coleção não encontrado.")
 
     def abrirColecao(self):
         nome = input("Digite o nome da coleção que deseja abrir: ")
@@ -386,18 +419,90 @@ class Relatorio:
         pass
 
 class Configuracoes:
-    def __init__(self, genero_favorito, metas, plataforma_principal):
+    def __init__(self, genero_favorito = "Não definido", metas = 0, plataforma_principal = "Não definida", limite_jogando = None, limite_horas = 0):
         self.genero_favorito = genero_favorito
         self.metas = metas
         self.plataforma_principal = plataforma_principal
+        self.limite_jogando = limite_jogando
+        self.limite_horas = limite_horas
+
+    def __str__(self):
+        return (
+            f"Configurações:\n"
+            f"- Gênero favorito: {self.genero_favorito}\n"
+            f"- Metas de Jogos para finalizar: {self.metas}\n"
+            f"- Plataforma principal: {self.plataforma_principal}\n"
+            f"- Limite de jogos 'jogando': {self.limite_jogando}\n"
+            f"- Limite de horas para finalizar jogo: {self.limite_horas}"
+        )
+    
+    def dicionario(self):
+        return {
+            "genero_favorito": self.genero_favorito,
+            "meta": self.metas,
+            "plataforma_principal": self.plataforma_principal,
+            "limite_jogando": self.limite_jogando,
+            "limite_horas": self.limite_horas
+        }
+
+    def salvar(self):
+        with open("configuracoes.json", "w", encoding="utf-8") as arquivo:
+            json.dump(self.dicionario(), arquivo, indent=4, ensure_ascii=False)
+
+    def carregar(self):
+        try:
+            with open("configuracoes.json", "r", encoding="utf-8") as arquivo:
+                dados = json.load(arquivo)
+
+                self.genero_favorito = dados.get("genero_favorito", self.genero_favorito)
+                self.metas = dados.get("meta", self.metas)
+                self.plataforma_principal = dados.get("plataforma_principal", self.plataforma_principal)
+                self.limite_jogando = dados.get("limite_jogando", self.limite_jogando)
+                self.limite_horas = dados.get("limite_horas", self.limite_horas)
+
+        except FileNotFoundError:
+             self.salvar()  
+
+    def menuConfiguracoes(self):
+        while True:
+            print("\nConfigurações:")
+            print(self)
+            print("\nOpções:\n1.Alterar gênero favorito\n2.Alterar meta de jogos finalizados\n3.Alterar plataforma principal\n4.Alterar limite de jogos\n5.Alterar limite de horas para finalizar um jogo\n6.Voltar")
+
+            opc = input("Digite uma opção: ")
+
+            if opc == "1":
+                self.genero_favorito = input("Novo gênero favorito: ")
+                self.salvar()
+            elif opc == "2":
+                self.metas = int(input("Digite suas metas: "))
+                self.salvar()
+            elif opc == "3":
+                self.plataforma_principal = input("Plataforma principal (pc, mobile, console): ")
+                self.salvar()
+            elif opc == "4":
+                self.limite_jogando = int(input("Limite de jogos com status'jogando': "))
+                self.salvar()
+            elif opc == "5":
+                self.limite_horas = int(input("Limite de horas para finalizar jogo: "))
+                self.salvar()
+            elif opc == "6":
+                break
+            else:
+                print("Opção inválida!")
 
 catalogo = Catalogo()
 catalogo.carregar()
 suasColecoes = ListaDeColecoes()
+configuracoes = Configuracoes()
+configuracoes.carregar()
 
 if __name__ == "__main__":
     while True:
-        print("- Opções: \n1.Catálogo\n2.Suas coleções\n3.Relatório\n4.Configurações\n5.Sair")
+        print("\n- Opções: \n1.Catálogo\n2.Suas coleções\n3.Relatório\n4.Configurações\n5.Sair")
+        cont = sum(1 for j in catalogo.jogos if j.status == "finalizado")
+        if cont < configuracoes.metas:
+            print("\n[Seus jogos finalizados estão abaixo de sua meta anual!]")
         user = int(input("Digite uma opção: "))
         if user == 5:
             break 
@@ -408,14 +513,20 @@ if __name__ == "__main__":
                 user = int(input("\nDigite uma opção do catálogo: "))
                 if user == 1:
                     jogo = catalogo.adicionarJogo()
-                if user == 2:
+                elif user == 2:
                     jogo = catalogo.removerJogo()
+                elif user == 7:
+                    break
                 elif user == 4:
                     jogo = catalogo.abrirJogo()
+                    if jogo is None:
+                        break
+                    if jogo is False:
+                        continue 
                     while True:
                         if jogo is None:
                             continue 
-                        print(f"\nJogo: {jogo.nome} ({jogo.genero}) - {jogo.plataforma}\n Status: {jogo.status}\n Horas jogadas: {jogo.horas_jogadas}\n Data de início: {jogo.data_inicio}\n Data de término {jogo.data_termino}")
+                        print(f"\nJogo: {jogo.nome} ({jogo.genero}) - {jogo.plataforma}\n Status: {jogo.status}\n Horas jogadas: {jogo.horas_jogadas}\n Data de início: {jogo.data_inicio}\n Data de término: {jogo.data_termino}")
                         print("\n1.Atualizar horas\n2.Atualizar status\n3.Reiniciar jogo\n4.Voltar")
                         user = int(input("Digite o que quer fazer com seu jogo: "))
                         if user == 1:
@@ -429,8 +540,8 @@ if __name__ == "__main__":
                             catalogo.salvar()
                         elif user == 4:
                             break
-                elif user == 7:
-                    break
+        elif user == 4:
+            configuracoes.menuConfiguracoes()
         elif user == 2:
             while True:
                 suasColecoes.listarColecoes()
@@ -438,6 +549,8 @@ if __name__ == "__main__":
                 user = int(input("\nDigite uma opção da coleção: "))
                 if user == 1:
                     suasColecoes.criarColecao()
+                elif user == 2:
+                    suasColecoes.removerColecao()
                 elif user == 3:
                     colecao = suasColecoes.abrirColecao()
                     if colecao is None:
@@ -445,10 +558,12 @@ if __name__ == "__main__":
                     while True:
                         print(f"\nColeção: {colecao.nome}")
                         colecao.exibirJogos()
-                        print("\n1.Adicionar Jogo\n2. Remover Jogo\n3. Voltar")
+                        print("\n1.Adicionar Jogo\n2.Remover Jogo\n3.Voltar")
                         user = int(input("Digite uma opção da coleção: "))
                         if user == 1:
                             colecao.adicionarJogo()
+                        elif user == 2:
+                            colecao.removerJogo()
                         elif user == 3:
                             break
                 elif user == 4:
@@ -457,4 +572,3 @@ if __name__ == "__main__":
             rel = Relatorio(catalogo.jogos)
             print("\nHoras totais:", rel.calcularHorasTotais())
             print("Quantidade de jogos:", rel.calcularJogos(),"\n")
-
