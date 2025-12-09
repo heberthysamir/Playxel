@@ -19,7 +19,7 @@ class Jogo:
         self.multiplayer = multiplayer
     
     def __str__(self):
-        return f"{self.nome} ({self.genero}) - {self.plataforma}"
+        return f"{self.nome}, {self.ano_lancamento}.({self.genero}) - {self.plataforma}"
     
     def __eq__(self, outro):
         if not isinstance(outro, Jogo):
@@ -356,10 +356,20 @@ class Catalogo:
             return
         self.jogos_filtrados = [jogo for jogo in self.jogos if jogo.status == status]
 
-    def ordenarTempoJogado(self):
-        pass
-    def ordenarLancamento(self):
-        pass
+    def ordenarTempoJogado(self,ordem):
+        lista = self.jogos_filtrados if self.jogos_filtrados is not None else self.jogos
+        if not lista:
+            print("\n[Nenhum jogo para ordenar!]")
+            return
+        lista.sort(key=lambda j: j.horas_jogadas, reverse=ordem)
+
+    def ordenarLancamento(self,ordem):
+        lista = self.jogos_filtrados if self.jogos_filtrados is not None else self.jogos
+        if not lista:
+            print("\n[Nenhum jogo para ordenar!]")
+            return
+        lista.sort(key=lambda j: j.ano_lancamento, reverse=ordem)
+
     def limparFiltro(self):
         self.jogos_filtrados = None  
 
@@ -546,15 +556,13 @@ if __name__ == "__main__":
         elif user == 1:
             while True:
                 catalogo.listarNomes()
-                print("\n-Opções do catálogo:\n1.Adicionar Jogo\n2.Remover Jogo\n3.Buscar Jogo\n4.Abrir Jogo\n5.Filtrar Jogos\n6.Ordenar Jogos\n7.Voltar")
+                print("\n-Opções do catálogo:\n1.Adicionar Jogo\n2.Remover Jogo\n3.Abrir Jogo\n4.Filtrar Jogos\n5.Ordenar Jogos\n6.Voltar")
                 user = int(input("\nDigite uma opção do catálogo: "))
                 if user == 1:
                     jogo = catalogo.adicionarJogo()
                 elif user == 2:
                     jogo = catalogo.removerJogo()
-                elif user == 7:
-                    break
-                elif user == 4:
+                elif user == 3:
                     jogo = catalogo.abrirJogo()
                     if jogo is None:
                         break
@@ -577,7 +585,7 @@ if __name__ == "__main__":
                             catalogo.salvar()
                         elif user == 4:
                             break
-                elif user == 5:
+                elif user == 4:
                     while True:
                         print("\n-Como deseja filtrar:\n1.Gênero\n2.Plataforma\n3.Status\n4.Limpar\n5.Voltar")
                         user = int(input("\nDigite uma opção: "))
@@ -595,6 +603,26 @@ if __name__ == "__main__":
                             break
                         elif user == 5:
                             break
+                elif user == 5:
+                    while True:
+                        print("\n-Como deseja ordenar:\n1.Lançamento recente\n2.Lançamento antigo\n3.Mais jogados\n4.Menos jogados\n5.Voltar")
+                        user = int(input("\nDigite uma opção: "))
+                        if user == 1:
+                            catalogo.ordenarLancamento(True)
+                            break
+                        elif user == 2:
+                            catalogo.ordenarLancamento(False)
+                            break
+                        elif user == 3:
+                            catalogo.ordenarTempoJogado(True)
+                            break
+                        elif user == 4:
+                            catalogo.ordenarTempoJogado(False)
+                            break
+                        elif user == 5:
+                            break
+                elif user == 6:
+                    break
         elif user == 4:
             configuracoes.menuConfiguracoes()
         elif user == 2:
