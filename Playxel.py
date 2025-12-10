@@ -215,6 +215,10 @@ class Catalogo:
                 plataforma = input("Digite a plataforma do seu jogo (pc, mobile, console): ")
                 ano = input("Digite o ano de laçamento: ")
                 multiplayer = input("Jogo é multiplayer?(sim ou não): ")
+                if multiplayer == "sim":
+                    multiplayer = True
+                else:
+                    multiplayer = False
                 status = int(input("Digite o status, 1.inativo, 2.jogando ou 3.finalizado: "))
                 if status == 1:
                     data_inicio = "Não informada"
@@ -380,12 +384,19 @@ class Colecao:
 
     def __str__(self):
         return f"{self.nome}"
+    
+    def dicionario(self):
+        return {
+            "nome": self.nome,
+            "jogos": [j.nome for j in self.jogos]
+        }
 
     def adicionarJogo(self):
         jogo_nome = input("Digite o nome do jogo que quer adicionar: ")
         for j in catalogo.jogos:
             if j.nome == jogo_nome:
                 self.jogos.append(j)
+                suasColecoes.salvar()
                 print("Jogo adicionado.")
                 return 
         print("Jogo não encontrado!")
@@ -395,6 +406,7 @@ class Colecao:
         for j in catalogo.jogos:
             if j.nome == nome:
                 self.jogos.remove(j)
+                suasColecoes.salvar()
                 print("Jogo deletado")
                 return
         print("Jogo não encontrado.")
@@ -411,6 +423,28 @@ class ListaDeColecoes:
     def __init__(self):
         self.colecaos = []
     
+    def salvar(self):
+        lista = [c.dicionario() for c in self.colecaos]
+
+        with open("colecoes.json", "w", encoding="utf-8") as arquivo:
+            json.dump(lista, arquivo, indent=4, ensure_ascii=False)
+
+
+    def carregar(self, catalogo):
+        try:
+            with open("colecoes.json", "r", encoding="utf-8") as arquivo:
+                dados = json.load(arquivo)
+            self.colecaos = []
+            for item in dados:
+                nova = Colecao(item["nome"])
+                for nome_jogo in item["jogos"]:
+                    for j in catalogo.jogos:
+                        if j.nome == nome_jogo:
+                            nova.jogos.append(j)
+                self.colecaos.append(nova)
+        except FileNotFoundError:
+            self.salvar()
+
     def criarColecao(self):
         nome = input("Digite o nome da coleção: ")
         for c in self.colecaos:
@@ -419,6 +453,7 @@ class ListaDeColecoes:
                 return
         nova = Colecao(nome, [])
         self.colecaos.append(nova)
+        self.salvar()
         print("Coleção criada!")
 
     def removerColecao(self):
@@ -426,6 +461,7 @@ class ListaDeColecoes:
         for c in self.colecaos:
             if c.nome == nome:
                 self.colecaos.remove(c)
+                self.salvar()
                 print("Coleção deletado")
                 return
         print("Coleção não encontrado.")
@@ -447,23 +483,27 @@ class ListaDeColecoes:
         else:
             for colecao in self.colecaos:
                 print("-",colecao)
-
-class Relatorio:
-    def __init__(self,jogos):
-        self.jogos = jogos
-
-    def calcularHorasTotais(self):
-        return sum(j.horas_jogadas for j in self.jogos)
     
-    def calcularJogos(self):
-        return len(self.jogos)
-    
-    def calcularAvaliacoes(self):
-        pass
-    def calcularPercentualStatus(self):
-        pass
-    def top5Jogos(self):
-        pass
+    def gerarColecoes(self, catalogo, configuracoes):
+        self.colecaos = [c for c in self.colecaos if not (
+            c.nome.startswith("Gênero") or 
+            c.nome.startswith("Plataforma") or 
+            c.nome == "Jogos Multiplayer"
+        )]
+        genero = configuracoes.genero_favorito
+        colecao_genero = Colecao(f"Gênero {genero}")
+        colecao_genero.jogos = [j for j in catalogo.jogos if j.genero == genero]
+        self.colecaos.append(colecao_genero)
+
+        plataforma = configuracoes.plataforma_principal
+        colecao_plataforma = Colecao(f"Plataforma {plataforma}")
+        colecao_plataforma.jogos = [j for j in catalogo.jogos if j.plataforma == plataforma]
+        self.colecaos.append(colecao_plataforma)
+
+        colecao_multi = Colecao("Jogos Multiplayer")
+        colecao_multi.jogos = [j for j in catalogo.jogos if j.multiplayer]
+        self.colecaos.append(colecao_multi)
+        self.salvar()
 
 class Configuracoes:
     def __init__(self, genero_favorito = "Não definido", metas = 0, plataforma_principal = "Não definida", limite_jogando = None, limite_horas = 0):
@@ -521,12 +561,14 @@ class Configuracoes:
             if opc == "1":
                 self.genero_favorito = input("Novo gênero favorito: ")
                 self.salvar()
+                suasColecoes.salvar()
             elif opc == "2":
                 self.metas = int(input("Digite suas metas: "))
                 self.salvar()
             elif opc == "3":
                 self.plataforma_principal = input("Plataforma principal (pc, mobile, console): ")
                 self.salvar()
+                suasColecoes.salvar()
             elif opc == "4":
                 self.limite_jogando = int(input("Limite de jogos com status'jogando': "))
                 self.salvar()
@@ -538,11 +580,38 @@ class Configuracoes:
             else:
                 print("Opção inválida!")
 
+class Relatorio:
+    def __init__(self,jogos):
+        self.jogos = jogos
+
+    def calcularHorasTotais(self):
+        return sum(j.horas_jogadas for j in self.jogos)
+    
+    def calcularJogos(self):
+        return len(self.jogos)
+    
+    def calcularAvaliacoes(self):
+        return sum(j.avaliacao for j in self.jogos) / len(self.jogos)
+    
+    def calcularPercentualStatus(self):
+        return f"Inativo: {sum(j.status == "inativo" for j in self.jogos)*100/len(self.jogos)}%\n Jogando: {sum(j.status == "jogando" for j in self.jogos)*100/len(self.jogos)}%\n Finalizado: {sum(j.status == "finalizado" for j in self.jogos)*100/len(self.jogos)}%"
+        
+    def top5Jogos(self):
+        if not self.jogos:
+            print("\n[Nenhum jogo cadastrado!]")
+            return
+        top5 = sorted(self.jogos, key=lambda j: j.horas_jogadas, reverse=True)[:5]
+        print("Top 5 jogos mais jogados:")
+        for i, jogo in enumerate(top5, start=1):
+            print(f"{i}. {jogo.nome} - {jogo.horas_jogadas} horas")
+
+
 catalogo = Catalogo()
 catalogo.carregar()
 suasColecoes = ListaDeColecoes()
 configuracoes = Configuracoes()
 configuracoes.carregar()
+suasColecoes.gerarColecoes(catalogo, configuracoes)
 
 if __name__ == "__main__":
     while True:
@@ -627,6 +696,7 @@ if __name__ == "__main__":
             configuracoes.menuConfiguracoes()
         elif user == 2:
             while True:
+                suasColecoes.gerarColecoes(catalogo, configuracoes)
                 suasColecoes.listarColecoes()
                 print("\n-Opções das Coleções:\n1.Criar coleção\n2.Remover coleção\n3.Abrir coleção\n4.Voltar")
                 user = int(input("\nDigite uma opção da coleção: "))
@@ -654,4 +724,7 @@ if __name__ == "__main__":
         elif user == 3:
             rel = Relatorio(catalogo.jogos)
             print("\nHoras totais:", rel.calcularHorasTotais())
-            print("Quantidade de jogos:", rel.calcularJogos(),"\n")
+            print("Quantidade de jogos:", rel.calcularJogos())
+            print("Média de avaliações:", rel.calcularAvaliacoes())
+            print("Porcentagens de status:\n", rel.calcularPercentualStatus())
+            rel.top5Jogos()

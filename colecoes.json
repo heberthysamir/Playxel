@@ -1,0 +1,31 @@
+[
+    {
+        "nome": "Favoritos",
+        "jogos": [
+            "Minecraft"
+        ]
+    },
+    {
+        "nome": "Gênero Ação",
+        "jogos": [
+            "Far Cry"
+        ]
+    },
+    {
+        "nome": "Plataforma mobile",
+        "jogos": [
+            "Minecraft",
+            "Clash Royale",
+            "Brawl Stars"
+        ]
+    },
+    {
+        "nome": "Jogos Multiplayer",
+        "jogos": [
+            "Minecraft",
+            "Minecraft",
+            "Brawl Stars",
+            "Far Cry"
+        ]
+    }
+]
