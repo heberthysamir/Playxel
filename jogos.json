@@ -9,7 +9,7 @@
         "data_termino": "Não informada",
         "ano_lancamento": "2001",
         "avaliacao": 0,
-        "multiplayer": "sim",
+        "multiplayer": true,
         "tipo": "JogoMobile",
         "extra": "android"
     },
@@ -22,8 +22,8 @@
         "data_inicio": "2011",
         "data_termino": "Não informada",
         "ano_lancamento": "2017",
-        "avaliacao": 0,
-        "multiplayer": "sim",
+        "avaliacao": 8,
+        "multiplayer": false,
         "tipo": "JogoMobile",
         "extra": "android"
     },
@@ -37,7 +37,7 @@
         "data_termino": "Não informada",
         "ano_lancamento": "2011",
         "avaliacao": 0,
-        "multiplayer": "sim",
+        "multiplayer": true,
         "tipo": "JogoPC",
         "extra": "minecraft"
     },
@@ -51,8 +51,36 @@
         "data_termino": "Não informada",
         "ano_lancamento": "2018",
         "avaliacao": 0,
-        "multiplayer": "sim",
+        "multiplayer": true,
         "tipo": "JogoMobile",
         "extra": "android"
+    },
+    {
+        "nome": "Mario",
+        "genero": "aventura",
+        "plataforma": "console",
+        "horas_jogadas": 0,
+        "status": "inativo",
+        "data_inicio": "Não informada",
+        "data_termino": "Não informada",
+        "ano_lancamento": "1995",
+        "avaliacao": 0,
+        "multiplayer": false,
+        "tipo": "JogoConsole",
+        "extra": "xbox"
+    },
+    {
+        "nome": "Far Cry",
+        "genero": "Ação",
+        "plataforma": "pc",
+        "horas_jogadas": 64.0,
+        "status": "finalizado",
+        "data_inicio": "2014",
+        "data_termino": "2025",
+        "ano_lancamento": "2012",
+        "avaliacao": "8",
+        "multiplayer": true,
+        "tipo": "JogoPC",
+        "extra": "Bedrock"
     }
 ]
