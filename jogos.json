@@ -20,9 +20,9 @@
         "horas_jogadas": 8.0,
         "status": "finalizado",
         "data_inicio": "2011",
-        "data_termino": "Não informada",
+        "data_termino": "2025",
         "ano_lancamento": "2017",
-        "avaliacao": 0,
+        "avaliacao": 8,
         "multiplayer": "sim",
         "tipo": "JogoMobile",
         "extra": "android"

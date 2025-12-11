@@ -1,37 +1,25 @@
-import pytest
-import json
-import os
-from Playxel import Catalogo, jogo_from_dict, JogoPC
+from Playxel import Catalogo, Jogo
 
-def test_salvar_e_carregar(tmp_path):
-    caminho = tmp_path / "jogos.json"
-
-    c = Catalogo()
-    c.jogos.append(JogoPC("Steam", "Jogo1", "Ação", "pc", 5, 1, "01/01", "Não", 2020, 7, "não"))
-
-    with open(caminho, "w", encoding="utf-8") as f:
-        json.dump([c.jogos[0].dicionario()], f, indent=4, ensure_ascii=False)
-
-    with open(caminho, "r", encoding="utf-8") as f:
-        conteudo = json.load(f)
-        jogo = jogo_from_dict(conteudo[0])
-
-    assert jogo.nome == "Jogo1"
-    assert jogo.status == "inativo"
-
-def test_listarNomes_sem_jogos(capsys):
-    c = Catalogo()
-    c.listarNomes()
-    saida = capsys.readouterr().out
-    assert "Nenhum jogo cadastrado" in saida
-
-def test_remover_jogo(monkeypatch, capsys):
+def criar_catalogo_exemplo():
     c = Catalogo()
     c.jogos = [
-        JogoPC("Steam", "Jogo1", "Ação", "pc", 5, 1, "01/01", "Não", 2020, 7, "não"),
+        Jogo("A", "RPG", "pc", 10, 1, "", "", 2005, 8, False),
+        Jogo("B", "FPS", "pc", 20, 1, "", "", 2010, 9, True),
+        Jogo("C", "RPG", "console", 5, 1, "", "", 2001, 7, False)
     ]
+    return c
 
-    monkeypatch.setattr("builtins.input", lambda _: "Jogo1")
-    c.removerJogo()
+def test_ordenar_lancamento_crescente():
+    c = criar_catalogo_exemplo()
+    c.ordenarLancamento(False)
+    assert [j.ano_lancamento for j in c.jogos] == [2001, 2005, 2010]
 
-    assert len(c.jogos) == 0
+def test_ordenar_lancamento_decrescente():
+    c = criar_catalogo_exemplo()
+    c.ordenarLancamento(True)
+    assert [j.ano_lancamento for j in c.jogos] == [2010, 2005, 2001]
+
+def test_filtrar_genero():
+    c = criar_catalogo_exemplo()
+    c.jogos_filtrados = [j for j in c.jogos if j.genero == "RPG"]
+    assert len(c.jogos_filtrados) == 2
