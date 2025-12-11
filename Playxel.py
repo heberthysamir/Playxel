@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 class Jogo:
     STATUS_MAP = {
@@ -7,7 +8,7 @@ class Jogo:
         3: "finalizado"
     }
     def __init__(self, nome, genero, plataforma, horas_jogadas, status, data_inicio, data_termino, ano_lancamento, avaliacao, multiplayer):
-        self.nome = nome
+        self._nome = nome
         self.genero = genero
         self.plataforma = plataforma
         self._horas_jogadas = horas_jogadas
@@ -15,7 +16,7 @@ class Jogo:
         self._data_inicio = data_inicio
         self._data_termino = data_termino
         self.ano_lancamento = ano_lancamento
-        self.avaliacao = avaliacao
+        self._avaliacao = avaliacao
         self.multiplayer = multiplayer
     
     def __str__(self):
@@ -43,62 +44,73 @@ class Jogo:
         }
 
     @property
-    def nome(self):
-        return self._nome
-    @nome.setter
-    def nome(self,nome):
-        if nome is None or len(nome.strip()) == 0:
-            raise ValueError("Nome não pode ser vazio")
+    def _nome(self):
+        return self.nome
+    @_nome.setter
+    def _nome(self,_nome):
+        if _nome is None or len(_nome.strip()) == 0:
+            raise ValueError("[Nome não pode ser vazio!]")
         else:
-            self._nome = nome
+            self.nome = _nome
+    
+    @property
+    def genero(self):
+        return self._genero
+    @genero.setter
+    def genero(self,genero):
+        if genero is None or len(genero.strip()) == 0:
+            raise ValueError("[Gênero não pode ser vazio!]")
+        else:
+            self._genero = genero
 
     @property
-    def avaliacao(self):
-        return self._avaliacao
-    @avaliacao.setter
-    def avaliacao(self, avaliacao):
-        if avaliacao is None or avaliacao == "":
-            self._avaliacao = None
+    def _avaliacao(self):
+        return self.avaliacao
+    @_avaliacao.setter
+    def _avaliacao(self, valor):
+        if valor is None or valor == "":
+            self.avaliacao = None
             return
         try:
-           avaliacao = float(avaliacao)
+            valor = float(valor)
         except ValueError:
             raise ValueError("A avaliação deve ser um número entre 0 e 10.")
-        if avaliacao <0 or avaliacao > 10:
+        
+        if not 0 <= valor <= 10:
             raise ValueError("A avaliação deve estar entre 0 e 10.")
-        self._avaliacao = avaliacao
+        self.avaliacao = valor
 
     @property
-    def horas_jogadas(self):
-        return self._horas_jogadas
-    @horas_jogadas.setter
-    def horas_jogadas(self,horas_jogadas):
-        if horas_jogadas <0:
-            raise ValueError("As horas não podem ser negativas")
+    def _horas_jogadas(self):
+        return self.horas_jogadas
+    @_horas_jogadas.setter
+    def _horas_jogadas(self,_horas_jogadas):
+        if _horas_jogadas <0:
+            raise ValueError("[As horas não podem ser negativas!]")
         else:
-            self._horas_jogadas = horas_jogadas
+            self.horas_jogadas = _horas_jogadas
 
     @property
-    def data_inicio(self):
-        return self._data_inicio
+    def _data_inicio(self):
+        return self.data_inicio
 
-    @data_inicio.setter
-    def data_inicio(self, data):
+    @_data_inicio.setter
+    def _data_inicio(self, data):
         if data is None or len(data.strip()) == 0:
-            self._data_inicio = "Data de início não informada"
+            self.data_inicio = "Data de início não informada"
         else:
-            self._data_inicio = data
+            self.data_inicio = data
 
     @property
-    def data_termino(self):
-        return self._data_termino
+    def _data_termino(self):
+        return self.data_termino
 
-    @data_termino.setter
-    def data_termino(self, data):
+    @_data_termino.setter
+    def _data_termino(self, data):
         if data is None or len(data.strip()) == 0:
-            self._data_termino = "Data de término não informada"
+            self.data_termino = "Data de término não informada"
         else:
-            self._data_termino = data
+            self.data_termino = data
 
     @property
     def status(self):
@@ -108,6 +120,41 @@ class Jogo:
         if status not in (1,2,3):
             raise ValueError("Status deve ser 1, 2 ou 3.")
         self._status = Jogo.STATUS_MAP[status]
+    
+    @property
+    def ano_lancamento(self):
+        return self._ano_lancamento
+    @ano_lancamento.setter
+    def ano_lancamento(self, ano):
+        if ano is None or ano == "":
+            self._ano_lancamento = None
+            return
+        try:
+            ano = int(ano)
+        except ValueError:
+            raise ValueError("Ano de lançamento deve ser um número inteiro.")
+        ano_atual = datetime.now().year
+        if ano < 1800 or ano > ano_atual:
+            raise ValueError(f"[O ano deve estar entre 1800 e {ano_atual}!]")
+        self._ano_lancamento = ano
+
+    @property
+    def multiplayer(self):
+        return self._multiplayer
+
+    @multiplayer.setter
+    def multiplayer(self, valor):
+        if valor is None:
+            self._multiplayer = False
+            return
+        if isinstance(valor, bool):
+            self._multiplayer = valor
+            return
+        valor = str(valor).strip().lower()
+
+        if valor not in ("sim", "não", "nao"):
+            raise ValueError("Multiplayer deve ser 'sim' ou 'não'.")
+        self._multiplayer = (valor == "sim")
 
     def atualizarHoras(self):
         horas = float(input("Digite quantas horas você quer adicionar:"))
@@ -252,7 +299,7 @@ class Catalogo:
                     jogo = JogoConsole(console, nome, genero, plataforma, horas_jogadas, status, data_inicio, data_termino, ano, avaliacao, multiplayer)
 
                 elif plataforma == "mobile":
-                    sistema = input("Seu sistema é android ou IOs? ")
+                    sistema = input("Seu sistema é android, IOs ou outro? ")
                     jogo = JogoMobile(sistema, nome, genero, plataforma, horas_jogadas, status, data_inicio, data_termino, ano, avaliacao, multiplayer)
 
                 else:
@@ -320,15 +367,36 @@ class Catalogo:
                     print("Digite um número válido.")
 
     def removerJogo(self):
-        nome = input("Digite o nome do jogo que deseja remover: ")
-        for jogo in self.jogos:
-            if jogo.nome == nome:
-                self.jogos.remove(jogo)
-                self.salvar()
-                print("Jogo deletado")
+        while True:
+            nome = input("Digite o nome do jogo que deseja remover: ").strip()
+            if nome == "":
                 return
-        print("Jogo não encontrado.")
-    
+            encontrados = [j for j in self.jogos if j.nome.lower() == nome.lower()]
+            if len(encontrados) == 0:
+                print("\n[Jogo não encontrado. Tente novamente!]\n")
+                continue
+            if len(encontrados) == 1:
+                self.jogos.remove(encontrados[0])
+                self.salvar()
+                print("\n[Jogo removido com sucesso!]\n")
+                return
+            print(f"\nForam encontrados {len(encontrados)} jogos com o nome '{nome}':\n")
+            for i, jogo in enumerate(encontrados, start=1):
+                print(f"{i}. {jogo.nome} - Plataforma: {jogo.plataforma}")
+            while True:
+                try:
+                    escolha = int(input("\nEscolha o número do jogo que deseja remover: "))
+                    if 1 <= escolha <= len(encontrados):
+                        jogo_escolhido = encontrados[escolha - 1]
+                        self.jogos.remove(jogo_escolhido)
+                        self.salvar()
+                        print("\n[Jogo removido com sucesso!]")
+                        return
+                    else:
+                        print("Opção inválida.")
+                except ValueError:
+                    print("Digite um número válido.")
+
     def filtrarGenero(self):
         generos = sorted({jogo.genero for jogo in self.jogos})
         print("\nGêneros cadastrados:")
