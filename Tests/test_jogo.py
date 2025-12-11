@@ -1,29 +1,35 @@
 import pytest
-from Playxel import Jogo, JogoPC, JogoConsole, JogoMobile, jogo_from_dict
+from Playxel import Jogo
 
-def test_criacao_jogo_basico():
-    jogo = Jogo("Teste", "Ação", "pc", 10, 1, "01/01/2024", "Não informada", 2020, 8, "não")
-    assert jogo.nome == "Teste"
-    assert jogo.genero == "Ação"
-    assert jogo.status == "inativo"
-    assert jogo.horas_jogadas == 10
+def test_jogo_criacao_basica():
+    j = Jogo("Halo", "FPS", "console", 10, 1, "01/01/2020", "", 2001, 8.5, True)
+    assert j.nome == "Halo"
+    assert j.genero == "FPS"
+    assert j.plataforma == "console"
+    assert j.horas_jogadas == 10
+    assert j.status == "inativo"
+    assert j.ano_lancamento == 2001
+    assert j.avaliacao == 8.5
+    assert j.multiplayer is True
 
-def test_subclasses_pc_console_mobile():
-    pc = JogoPC("Steam", "Jogo PC", "Ação", "pc", 10, 1, "01/01", "Não", 2020, 8, "não")
-    console = JogoConsole("PS5", "Jogo Console", "RPG", "console", 5, 2, "01/02", "Não", 2018, 7, "sim")
-    mobile = JogoMobile("Android", "Jogo Mobile", "Puzzle", "mobile", 3, 1, "01/03", "Não", 2019, 6, "não")
+def test_jogo_nome_invalido():
+    with pytest.raises(ValueError):
+        Jogo("", "RPG", "pc", 5, 1, "", "", 2010, 7, False)
 
-    assert pc.launcher == "Steam"
-    assert console.console == "PS5"
-    assert mobile.sistema == "Android"
+def test_jogo_avaliacao_invalida():
+    with pytest.raises(ValueError):
+        Jogo("Zelda", "Aventura", "console", 5, 1, "", "", 2017, 15, False)
 
-def test_dicionario_e_reconstrucao():
-    original = JogoPC("Steam", "Elden Ring", "Ação", "pc", 50, 3, "01/01", "01/03", 2022, 10, "não")
-    d = original.dicionario()
+def test_eq_mesmo_jogo_mesma_plataforma():
+    j1 = Jogo("Minecraft", "Sandbox", "pc", 10, 1, "", "", 2010, 9, True)
+    j2 = Jogo("minecraft", "Sandbox", "pc", 5, 1, "", "", 2011, 9, True)
+    assert j1 == j2
 
-    novo = jogo_from_dict(d)
+def test_eq_jogos_diferentes():
+    j1 = Jogo("Minecraft", "Sandbox", "pc", 10, 1, "", "", 2010, 9, True)
+    j2 = Jogo("Terraria", "Sandbox", "pc", 5, 1, "", "", 2011, 9, True)
+    assert j1 != j2
 
-    assert isinstance(novo, JogoPC)
-    assert novo.nome == "Elden Ring"
-    assert novo.launcher == "Steam"
-    assert novo.status == "finalizado"
+def test_str_retorno():
+    j = Jogo("Halo", "FPS", "console", 10, 1, "", "", 2001, 8.5, True)
+    assert "Halo" in str(j) and "2001" in str(j)

@@ -7,7 +7,7 @@ class Jogo:
         3: "finalizado"
     }
     def __init__(self, nome, genero, plataforma, horas_jogadas, status, data_inicio, data_termino, ano_lancamento, avaliacao, multiplayer):
-        self._nome = nome
+        self.nome = nome
         self.genero = genero
         self.plataforma = plataforma
         self._horas_jogadas = horas_jogadas
@@ -15,7 +15,7 @@ class Jogo:
         self._data_inicio = data_inicio
         self._data_termino = data_termino
         self.ano_lancamento = ano_lancamento
-        self._avaliacao = avaliacao
+        self.avaliacao = avaliacao
         self.multiplayer = multiplayer
     
     def __str__(self):
@@ -417,7 +417,7 @@ class Colecao:
             return
 
         for jogo in self.jogos:
-            print(" -", jogo.nome)
+            print(jogo)
 
 class ListaDeColecoes:
     def __init__(self):
@@ -641,6 +641,8 @@ if __name__ == "__main__":
                         if jogo is None:
                             continue 
                         print(f"\nJogo: {jogo.nome} ({jogo.genero}) - {jogo.plataforma}\n Status: {jogo.status}\n Horas jogadas: {jogo.horas_jogadas}\n Data de início: {jogo.data_inicio}\n Data de término: {jogo.data_termino}")
+                        if jogo.avaliacao != 0:
+                            print(" Avaliação(1-10): ",jogo.avaliacao)
                         print("\n1.Atualizar horas\n2.Atualizar status\n3.Reiniciar jogo\n4.Voltar")
                         user = int(input("Digite o que quer fazer com seu jogo: "))
                         if user == 1:
