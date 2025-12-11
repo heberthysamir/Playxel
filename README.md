@@ -30,7 +30,7 @@
 ### Class Catalogo:
 > Classe responsável por gerenciar todos os jogos cadastrados no sistema (filtros, ordenações e buscas).
 - Atributos: jogos
-- Métodos principais: adicionarJogo(), removerJogo(), listarNomes(), abrirJogo(), filtrarGenero(), filtrarPlataforma(), filtrarrStatus(), ordenarPorTempo(), ordenarTempoJogado(), ordenarLancamento().
+- Métodos principais: adicionarJogo(), removerJogo(), listarNomes(), abrirJogo(), filtrarGenero(), filtrarPlataforma(), filtrarrStatus(), ordenarTempoJogado(), ordenarLancamento().
 
 ### Class Colecao:
 > Representa uma coleção nomeada de jogos criada pelo usuário (ex.: Favoritos).
@@ -44,7 +44,7 @@
 
 ### Class Relatorio:
 > Classe utilitária responsável por gerar estatísticas e relatórios sobre o catálogo de jogos.
-- Atributos: horas_jogadas, avaliação, status
+- Atributos: jogos
 - Métodos: totalHoras(), mediaAvaliacoesFinalizados(), percentualPorStatus(), top5MaisJogados()
 
 ### Class Configuracoes:
