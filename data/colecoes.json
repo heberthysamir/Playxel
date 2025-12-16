@@ -1,0 +1,70 @@
+[
+    {
+        "nome": "Favoritos",
+        "jogos": [
+            {
+                "nome": "Minecraft",
+                "plataforma": "mobile"
+            }
+        ]
+    },
+    {
+        "nome": "Gênero aventura",
+        "jogos": [
+            {
+                "nome": "Minecraft",
+                "plataforma": "mobile"
+            },
+            {
+                "nome": "Minecraft",
+                "plataforma": "pc"
+            },
+            {
+                "nome": "Mario",
+                "plataforma": "console"
+            }
+        ]
+    },
+    {
+        "nome": "Plataforma mobile",
+        "jogos": [
+            {
+                "nome": "Minecraft",
+                "plataforma": "mobile"
+            },
+            {
+                "nome": "Clash Royale",
+                "plataforma": "mobile"
+            },
+            {
+                "nome": "Brawl Stars",
+                "plataforma": "mobile"
+            },
+            {
+                "nome": "Subway Surf",
+                "plataforma": "mobile"
+            }
+        ]
+    },
+    {
+        "nome": "Jogos Multiplayer",
+        "jogos": [
+            {
+                "nome": "Minecraft",
+                "plataforma": "mobile"
+            },
+            {
+                "nome": "Minecraft",
+                "plataforma": "pc"
+            },
+            {
+                "nome": "Brawl Stars",
+                "plataforma": "mobile"
+            },
+            {
+                "nome": "Far Cry",
+                "plataforma": "pc"
+            }
+        ]
+    }
+]
