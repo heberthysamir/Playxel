@@ -1,4 +1,4 @@
-from Playxel import jogo_from_dict, JogoPC
+from jogo import jogo_from_dict, JogoPC
 
 def test_converter_pc():
     data = {

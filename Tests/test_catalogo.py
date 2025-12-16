@@ -1,4 +1,5 @@
-from Playxel import Catalogo, Jogo
+from catalogo import Catalogo
+from jogo import Jogo
 
 def criar_catalogo_exemplo():
     c = Catalogo()

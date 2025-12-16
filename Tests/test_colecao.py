@@ -1,4 +1,5 @@
-from Playxel import Colecao, Jogo
+from colecao import Colecao
+from jogo import Jogo
 
 def test_criar_colecao_e_adicionar():
     j1 = Jogo("Skyrim", "RPG", "pc", 100, 3, "", "", 2011, 10, False)

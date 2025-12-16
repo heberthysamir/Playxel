@@ -1,5 +1,5 @@
 import pytest
-from Playxel import Jogo
+from jogo import Jogo
 
 def test_jogo_criacao_basica():
     j = Jogo("Halo", "FPS", "console", 10, 1, "01/01/2020", "", 2001, 8.5, True)
